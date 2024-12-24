@@ -75,3 +75,56 @@ group by
 ORDER by
   trips_amount DESC
 
+Task 4:
+Retrieve the identifiers of the O'Hare and Loop neighborhoods  from the neighborhoods table.
+
+SQL:
+SELECT
+    neighborhood_id,
+    name
+FROM
+    neighborhoods
+WHERE name LIKE '%O''Hare%' OR name = 'Loop'
+
+Task 5:
+For each hour, retrieve the weather condition records from the weather_records table. Break all hours into two groups: Bad if the description field contains the words rain or storm, and Good for others. The final table must include two fields: date and hour (ts) and weather_conditions.
+
+SQL:
+SELECT
+CASE
+    WHEN weather_records.description LIKE '%rain%' OR weather_records.description LIKE '%storm%' THEN 'Bad'
+    ELSE 'Good'
+END as weather_conditions,
+    ts
+FROM
+    weather_records
+
+Task 6:
+Retrieve from the trips table all the rides that started in the Loop (pickup_location_id: 50) on a Saturday and ended at O'Hare (dropoff_location_id: 63). Get the weather conditions for each ride. Also, retrieve the duration of each ride. Ignore rides for which data on weather conditions is not available.
+
+The table columns should be in the following order:
+
+start_ts
+weather_conditions
+duration_seconds
+Sort by trip_id.
+
+SQL:
+SELECT
+    trips.start_ts,
+    CASE
+    WHEN weather_records.description LIKE '%rain%' OR weather_records.description LIKE '%storm%' THEN 'Bad'
+    ELSE 'Good'
+END as weather_conditions,
+    trips.duration_seconds
+FROM trips
+    INNER JOIN weather_records ON trips.start_ts = weather_records.ts
+WHERE 
+    pickup_location_id = 50
+    and dropoff_location_id = 63
+    and EXTRACT(DOW FROM trips.start_ts) = 6
+ORDER by
+    trips.trip_id;
+
+  
+
